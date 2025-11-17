@@ -2,6 +2,17 @@
 
 ## File Overview
 
+### Installation and set-up
+first create a virtual env
+
+conda create --name devfet python=3.12
+
+pip install brain-slam
+
+pip install plotly
+
+pip install pandas
+
 ### 1. directories.py
 **Purpose**: Central configuration for all directory paths  
 **Functions**:
