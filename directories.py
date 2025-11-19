@@ -20,9 +20,9 @@ def output_directories(filename=None, participant_session=None):
     output_csv_file = os.path.join('/scratch/hdienye/dhcp_full_info/info/', 'all_results.csv')
     
     # Paths that depend on variables
-    principal_tex_path = os.path.join(principal_tex_dir, 'principal_curv_{}.gii'.format(filename)) if filename else None
-    mean_tex_path = os.path.join(mean_tex_dir, 'filt_mean_curv_{}.gii'.format(filename)) if filename else None
-    spangy_tex_path = f"/scratch/hdienye/dhcp_full_info/spangy/textures/spangy_dom_band_{participant_session}.gii" if participant_session else None
+    principal_tex_path = os.path.join(principal_tex_dir, 'principal_curv_{}'.format(filename)) if filename else None
+    mean_tex_path = os.path.join(mean_tex_dir, 'filt_mean_curv_{}'.format(filename)) if filename else None
+    spangy_tex_path = f"/scratch/hdienye/dhcp_full_info/spangy/textures/spangy_dom_band_{participant_session}" if participant_session else None
     
     return {
         'mesh_save_path': mesh_save_path,
