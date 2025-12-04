@@ -4,6 +4,7 @@ import trimesh
 import slam.io as sio
 import slam.texture as stex
 import plotly.graph_objs as go
+import plotly.colors as pc
 import nibabel as nib
 
 # Function to get hull area
@@ -603,3 +604,126 @@ def mesh_orientation(mesh, hemisphere):
         raise ValueError(f'Invalid hemisphere parameter: {hemisphere}. Expected "left" or "right".')
 
     return mesh, camera_medial, camera_lateral
+
+def create_colormap_with_black_stripes(base_colormap, num_intervals=10, black_line_width=0.01):
+    temp_c = pc.get_colorscale(base_colormap)
+    temp_c_2 = [ii[1] for ii in temp_c]
+    old_colormap = convert_rgb_to_hex_if_needed(temp_c_2)
+    custom_colormap = []
+    base_intervals = np.linspace(0, 1, len(old_colormap))
+
+    for i in range(len(old_colormap) - 1):
+        custom_colormap.append([base_intervals[i], old_colormap[i]])
+        if i % (len(old_colormap) // num_intervals) == 0:
+            black_start = base_intervals[i]
+            black_end = min(black_start + black_line_width, 1)
+            custom_colormap.append([black_start, 'rgb(0, 0, 0)'])
+            custom_colormap.append([black_end, old_colormap[i]])
+    custom_colormap.append([1, old_colormap[-1]])
+    return custom_colormap
+
+def plot_mesh_with_colorbar(vertices, faces, scalars=None, color_min=None, color_max=None, camera=None, show_contours=False, colormap='jet', use_black_intervals=False, center_colormap_on_zero=False, title=None):
+    fig_data = dict(
+        x=vertices[:, 0], y=vertices[:, 1], z=vertices[:, 2],
+        i=faces[:, 0], j=faces[:, 1], k=faces[:, 2],
+        flatshading=False, hoverinfo='text', showscale=False
+    )
+
+    vertices_flipped = flip_translate_mesh(vertices)
+    fig_data_flipped = dict(
+        x=vertices_flipped[:, 0], y=vertices_flipped[:, 1], z=vertices_flipped[:, 2],
+        i=faces[:, 0], j=faces[:, 1], k=faces[:, 2],
+        flatshading=False, hoverinfo='text', showscale=False
+    )
+
+    if scalars is not None:
+        color_min = color_min if color_min is not None else np.min(scalars)
+        color_max = color_max if color_max is not None else np.max(scalars)
+
+        if center_colormap_on_zero:
+            max_abs_value = max(abs(color_min), abs(color_max))
+            color_min, color_max = -max_abs_value, max_abs_value
+
+        if use_black_intervals:
+            colorscale = create_colormap_with_black_stripes(colormap)
+        else:
+            colorscale = colormap
+
+        fig_data.update(
+            intensity=scalars,
+            intensitymode='vertex',
+            cmin=color_min,
+            cmax=color_max,
+            colorscale=colorscale,
+            showscale=True,
+            colorbar=dict(
+                title="Scalars",
+                tickformat=".2f",
+                thickness=30,
+                len=0.9
+            ),
+            hovertext=[f'Scalar value: {s:.2f}' for s in scalars]
+        )
+        fig_data_flipped.update(
+            intensity=scalars,
+            intensitymode='vertex',
+            cmin=color_min,
+            cmax=color_max,
+            colorscale=colorscale,
+            showscale=True,
+            colorbar=dict(
+                title="Scalars",
+                tickformat=".2f",
+                thickness=30,
+                len=0.9
+            ),
+            hovertext=[f'Scalar value: {s:.2f}' for s in scalars]
+        )
+    fig = go.Figure(data=[go.Mesh3d(**fig_data), go.Mesh3d(**fig_data_flipped)])
+    if show_contours:
+        fig.data[0].update(contour=dict(show=True, color='black', width=2))
+
+    # Update layout
+    layout_dict = dict(
+        scene=dict(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False),
+            camera=camera
+        ),
+        height=900,
+        width=1200,
+        margin=dict(l=10, r=10, b=10, t=50 if title else 10),
+        showlegend=True,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="right",
+            x=0.99,
+            bgcolor='rgba(255, 255, 255, 0.8)'
+        )
+    )
+
+    if title:
+        layout_dict['title'] = dict(
+            text=title,
+            x=0.5,
+            y=0.95,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=20)
+        )
+
+    fig.update_layout(**layout_dict)
+    return fig
+
+def convert_rgb_to_hex_if_needed(colormap):
+    hex_colormap = []
+    for color in colormap:
+        if color.startswith('rgb'):
+            rgb_values = [int(c) for c in color[4:-1].split(',')]
+            hex_color = '#{:02x}{:02x}{:02x}'.format(*rgb_values)
+            hex_colormap.append(hex_color)
+        else:
+            hex_colormap.append(color)
+    return hex_colormap
