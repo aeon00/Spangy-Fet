@@ -7,8 +7,8 @@ from directories import output_directories
 # Declare Paths
 output_dirs = output_directories()
 dir_meshes = output_dirs['mesh_save_path'] # Smooth fetal SURFACE PATH
-dir_curv = output_dirs['mean_tex_dir'] #Mean curvature directory
-dir_dpf = output_dirs['dpf_tex_dir'] #Mean curvature directory
+dir_curv = output_dirs['mean_tex_dir'] # Mean curvature directory
+dir_dpf = output_dirs['dpf_tex_dir'] # Output dpf texture directory
 
 if __name__ == "__main__":
     for filename in os.listdir(dir_meshes):

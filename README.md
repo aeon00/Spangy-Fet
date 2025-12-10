@@ -95,7 +95,7 @@ principal_tex_path = output_dirs['principal_tex_path']
    ```
    your_project/
    ├── directories.py
-   ├── main_modified.py
+   ├── main.py
    ├── spangy_analysis.py
    └── utils.py
    ```
