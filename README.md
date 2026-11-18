@@ -6,23 +6,8 @@
 First create a virtual env
 
 ```bash
-conda create --name devfet
-
-pip install brain-slam
-
-pip install numpy
-
-pip install matplotlib
-
-pip install pandas
-
-pip install seaborn
-
-pip install plotly
-
-pip install -U kaleido
-
-pip install dash
+conda create --name devfet python=3.12
+pip install -r requirements.txt
 ```
 
 ### 1. directories.py
