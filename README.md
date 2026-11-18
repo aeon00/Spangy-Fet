@@ -6,19 +6,19 @@
 First create a virtual env
 
 ```bash
-conda create --name devfet python=3.8.2
+conda create --name devfet
 
 pip install brain-slam
 
-pip install numpy==1.19
+pip install numpy
 
-pip install matplotlib==3.4.3
+pip install matplotlib
 
-pip install pandas==1.4.4
+pip install pandas
 
-pip install seaborn==0.11.2
+pip install seaborn
 
-pip install plotly==5.5.0
+pip install plotly
 
 pip install -U kaleido
 
